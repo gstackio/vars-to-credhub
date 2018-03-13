@@ -1,0 +1,9 @@
+foo: bar
+bar: baz
+ml-test: |
+  multi-value
+  string
+  test
+someint: 3
+somefloat: 2.45
+somebool: false

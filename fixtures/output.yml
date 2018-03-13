@@ -1,0 +1,22 @@
+credentials:
+- type: value
+  name: foo
+  value: bar
+- type: value
+  name: bar
+  value: baz
+- type: value
+  name: ml-test
+  value: |
+    multi-value
+    string
+    test
+- type: value
+  name: someint
+  value: "3"
+- type: value
+  name: somefloat
+  value: "2.45"
+- type: value
+  name: somebool
+  value: "false"
