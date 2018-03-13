@@ -13,6 +13,6 @@ pipelines or in [BOSH](https://bosh.io) commands.
 
 ## Running
 ```shell
-$ ./vars-to-credhub --prefix /concourse/main < vars.yml > bulk-import.yml
+$ ./vars-to-credhub --prefix /concourse/main --vars-file vars.yml > bulk-import.yml
 $ credhub bulk-import --file bulk-import.yml
 ```
