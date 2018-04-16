@@ -7,6 +7,7 @@ import (
 	"github.com/mitchellh/colorstring"
 
 	"golang.org/x/crypto/ssh/terminal"
+
 	"gopkg.in/alecthomas/kingpin.v2"
 	"gopkg.in/yaml.v2"
 )
