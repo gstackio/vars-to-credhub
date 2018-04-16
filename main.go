@@ -18,6 +18,7 @@ var (
 
 func main() {
 	kingpin.Parse()
+
 	encoder := yaml.NewEncoder(os.Stdout)
 
 	if bulkImport, err := Transform(*varPrefix, *inputFile); err != nil {
