@@ -13,7 +13,7 @@ import (
 
 var (
 	varPrefix = kingpin.Flag("prefix", "credhub path prefix for vars").Short('p').Default("/concourse/main").String()
-	inputFile = kingpin.Flag("vars-file", "Pipeline vars file").Short('f').File()
+	inputFile = kingpin.Flag("vars-file", "Pipeline vars file").Short('f').Required().File()
 )
 
 func main() {
