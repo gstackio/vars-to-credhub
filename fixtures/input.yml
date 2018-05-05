@@ -7,3 +7,25 @@ ml-test: |
 someint: 3
 somefloat: 2.45
 somebool: false
+my_cert:
+  certificate: |
+    -----BEGIN CERTIFICATE----
+    fake cert
+    -----END CERTIFICATE----
+  ca: |
+    -----BEGIN CERTIFICATE----
+    also fake
+    -----END CERTIFICATE----
+  private_key: |
+    -----BEGIN FAKE RSA PRIVATE KEY----
+    fake key
+    -----END FAKE RSA PRIVATE KEY----
+uaa-key:
+  private_key: |
+    -----BEGIN FAKE RSA PRIVATE KEY-----
+    fake key is fake
+    -----END FAKE RSA PRIVATE KEY----
+  public_key: |
+    -----BEGIN PUBLIC KEY-----
+    fake public
+    -----END PUBLIC KEY-----

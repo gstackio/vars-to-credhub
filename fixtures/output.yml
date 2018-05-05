@@ -20,3 +20,29 @@ credentials:
 - type: value
   name: somebool
   value: "false"
+- name: my_cert
+  type: certificate
+  value:
+    ca: |
+      -----BEGIN CERTIFICATE----
+      also fake
+      -----END CERTIFICATE----
+    certificate: |
+      -----BEGIN CERTIFICATE----
+      fake cert relax
+      -----END CERTIFICATE----
+    private_key: |
+      -----BEGIN FAKE RSA PRIVATE KEY----
+      fake key
+      -----END FAKE RSA PRIVATE KEY----
+- name: uaa-key
+  type: rsa
+  value:
+    private_key: |
+      -----BEGIN FAKE RSA PRIVATE KEY-----
+      fake key is fake
+      -----END FAKE RSA PRIVATE KEY----
+    public_key: |
+      -----BEGIN PUBLIC KEY-----
+      fake public
+      -----END PUBLIC KEY-----
