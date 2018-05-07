@@ -28,6 +28,10 @@ func isMap(x interface{}) bool {
 }
 
 func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey string) Importable {
+    //RSA key types if output from bosh will have a fingerprint that credhub
+    //can't deal with, so we'll just remove it. Delete is harmless if the
+    //key DNE - so just do it on every map.
+    delete(mapVal, "public_key_fingerprint")
     return Importable{
         Name: fmt.Sprintf("%s/%s", prefix, parentKey),
         Type: getType(parentKey, fmt.Sprint(mapVal)),
