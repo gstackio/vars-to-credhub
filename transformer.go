@@ -39,8 +39,6 @@ func getType(key string, valStr string) string {
     //attempt to guess the type for the item, default to "value"
     if strings.Contains(key, "password") || strings.Contains(key, "secret") {
         return "password"
-    } else if strings.Contains(key, "user") || strings.Contains(key, "login") {
-        return "user"
     //the cert check should be above rsa since a cert may also contain a pk
     } else if strings.Contains(valStr, "CERTIFICATE") {
         return "certificate"
