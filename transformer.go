@@ -70,14 +70,14 @@ func Transform(prefix string, input io.Reader) (BulkImport, error) {
     vals := make([]Importable, 0, len(pipelineVars))
     for key, val := range pipelineVars {
 
-        // Let's require, for now, simple types only in the var field
+        // Let's require, for now, simple types & maps in the var field
         var valStr string
         switch v := val.(type) {
         default:
             if isMap(val) {
                 vals = append(vals, handleMap(val.(map[interface{}]interface{}), prefix, key.(string)))
             } else {
-                return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values are supported", v)
+                return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values & maps are supported", v)
             }
         case bool, float32, float64, int, int16, int32, int64, string, uint, uint16, uint32, uint64:
             valStr = fmt.Sprint(val)
