@@ -28,11 +28,11 @@ func TestTransformer(t *testing.T) {
 
 		when("Doing an ETL", func() {
 			it("Imported the input yml successfully", func() {
-				Expect(len(input)).To(Equal(6))
+				Expect(len(input)).To(Equal(8))
 			})
 
 			it("Imported the output yml successfully", func() {
-				Expect(len(output.Credentials)).To(Equal(6))
+				Expect(len(output.Credentials)).To(Equal(8))
 			})
 
 			it("Transformed the output correctly", func() {
@@ -40,7 +40,7 @@ func TestTransformer(t *testing.T) {
 				out, err := Transform("/foo", file)
 
 				Expect(err).To(BeNil())
-				Expect(len(out.Credentials)).To(Equal(6))
+				Expect(len(out.Credentials)).To(Equal(8))
 			})
 
 			it("Failed to transform bad input", func() {

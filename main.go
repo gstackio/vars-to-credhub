@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/mitchellh/colorstring"
 
@@ -20,15 +23,18 @@ var (
 func main() {
 	kingpin.Parse()
 
-	encoder := yaml.NewEncoder(os.Stdout)
+	var b bytes.Buffer
+	encoder := yaml.NewEncoder(&b)
 
 	if bulkImport, err := Transform(*varPrefix, *inputFile); err != nil {
 		log.Fatal(err)
 	} else {
 		encoder.Encode(bulkImport)
+		outStr := b.String()
+		fmt.Println(strings.Replace(outStr, "subMapValue", "value", -1))
 		// taken from https://rosettacode.org/wiki/Check_output_device_is_a_terminal#Go
 		if terminal.IsTerminal(int(os.Stdout.Fd())) {
-			colorstring.Println("[bold][green]Done! Save this file and run [reset]credhub bulk-import --file /path/to/file")
+			colorstring.Println("[bold][green]Done! Double check these results, then save and run [reset]credhub import --file /path/to/file")
 		}
 	}
 }
