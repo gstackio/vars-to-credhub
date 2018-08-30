@@ -25,7 +25,6 @@ credentials:
   value:
   - foo
   - bar
-
 - name: my_cert
   type: certificate
   value:

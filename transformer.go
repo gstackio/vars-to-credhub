@@ -27,7 +27,7 @@ func isMap(x interface{}) bool {
 	return strings.HasPrefix(t, "map[")
 }
 
-// Utility to test if something is a map
+// Utility to test if something is a an array
 func isArray(x interface{}) bool {
 	t := fmt.Sprintf("%T", x)
 	return strings.HasPrefix(t, "[]inter")
