@@ -20,6 +20,12 @@ credentials:
 - type: value
   name: somebool
   value: "false"
+- type: value
+  name: array-test
+  value:
+  - foo
+  - bar
+
 - name: my_cert
   type: certificate
   value:

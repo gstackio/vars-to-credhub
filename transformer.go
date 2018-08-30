@@ -10,10 +10,10 @@ import (
 
 // Importable represents a credential to be loaded into Credhub via `bulk-import`
 type Importable struct {
-	Name   string                      `yaml:"name"`
-	Type   string                      `yaml:"type"`
-	Value  string                      `yaml:"value,omitempty"`
-	SubMap map[interface{}]interface{} `yaml:"subMapValue,omitempty"`
+	Name   string      `yaml:"name"`
+	Type   string      `yaml:"type"`
+	Value  string      `yaml:"value,omitempty"`
+	SubMap interface{} `yaml:"subMapValue,omitempty"`
 }
 
 // BulkImport represents what will be actually sent to Credhub
@@ -27,6 +27,12 @@ func isMap(x interface{}) bool {
 	return strings.HasPrefix(t, "map[")
 }
 
+// Utility to test if something is a map
+func isArray(x interface{}) bool {
+	t := fmt.Sprintf("%T", x)
+	return strings.HasPrefix(t, "[]inter")
+}
+
 func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey string) Importable {
 	//RSA key types if output from bosh will have a fingerprint that credhub
 	//can't deal with, so we'll just remove it. Delete is harmless if the
@@ -36,6 +42,14 @@ func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey stri
 		Name:   fmt.Sprintf("%s/%s", prefix, parentKey),
 		Type:   getType(parentKey, fmt.Sprint(mapVal)),
 		SubMap: mapVal,
+	}
+}
+
+func handleArray(arrayVal []interface{}, prefix string, key string) Importable {
+	return Importable{
+		Name:   fmt.Sprintf("%s/%s", prefix, key),
+		Type:   getType(key, fmt.Sprint(arrayVal)),
+		SubMap: arrayVal,
 	}
 }
 
@@ -76,10 +90,12 @@ func Transform(prefix string, input io.Reader) (BulkImport, error) {
 		default:
 			if isMap(val) {
 				vals = append(vals, handleMap(val.(map[interface{}]interface{}), prefix, key.(string)))
+			} else if isArray(val) {
+				vals = append(vals, handleArray(val.([]interface{}), prefix, key.(string)))
 			} else {
 				return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values & maps are supported", v)
 			}
-		case bool, float32, float64, int, int16, int32, int64, string, uint, uint16, uint32, uint64:
+		case bool, float32, float64, int, int16, int32, int64, string, uint, uint16, uint32, uint64, nil:
 			valStr = fmt.Sprint(val)
 			vals = append(vals, makeImportable(prefix, key.(string), valStr))
 		}
