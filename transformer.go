@@ -8,12 +8,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var (
+	IsJson   bool       = false
+)
+
+
 // Importable represents a credential to be loaded into Credhub via `bulk-import`
 type Importable struct {
-	Name   string                      `yaml:"name"`
-	Type   string                      `yaml:"type"`
-	Value  string                      `yaml:"value,omitempty"`
-	SubMap map[interface{}]interface{} `yaml:"subMapValue,omitempty"`
+	Name   string      `yaml:"name"`
+	Type   string      `yaml:"type"`
+	Value  string      `yaml:"value,omitempty"`
+	SubMap interface{} `yaml:"subMapValue,omitempty"`
 }
 
 // BulkImport represents what will be actually sent to Credhub
@@ -25,6 +30,12 @@ type BulkImport struct {
 func isMap(x interface{}) bool {
 	t := fmt.Sprintf("%T", x)
 	return strings.HasPrefix(t, "map[")
+}
+
+// Utility to test if something is a an array
+func isArray(x interface{}) bool {
+	t := fmt.Sprintf("%T", x)
+	return strings.HasPrefix(t, "[]inter")
 }
 
 func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey string) Importable {
@@ -39,6 +50,14 @@ func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey stri
 	}
 }
 
+func handleArray(arrayVal []interface{}, prefix string, key string) Importable {
+	return Importable{
+		Name:   fmt.Sprintf("%s/%s", prefix, key),
+		Type:   getType(key, fmt.Sprint(arrayVal)),
+		SubMap: arrayVal,
+	}
+}
+
 func getType(key string, valStr string) string {
 	//attempt to guess the type for the item, default to "value"
 	if strings.Contains(key, "password") || strings.Contains(key, "secret") {
@@ -48,7 +67,10 @@ func getType(key string, valStr string) string {
 		return "certificate"
 	} else if strings.Contains(valStr, "KEY---") {
 		return "rsa"
+	} else if IsJson {
+		return "json"
 	}
+
 	return "value"
 }
 
@@ -76,10 +98,13 @@ func Transform(prefix string, input io.Reader) (BulkImport, error) {
 		default:
 			if isMap(val) {
 				vals = append(vals, handleMap(val.(map[interface{}]interface{}), prefix, key.(string)))
+			} else if isArray(val) {
+				IsJson = true
+				vals = append(vals, handleArray(val.([]interface{}), prefix, key.(string)))
 			} else {
 				return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values & maps are supported", v)
 			}
-		case bool, float32, float64, int, int16, int32, int64, string, uint, uint16, uint32, uint64:
+		case bool, float32, float64, int, int16, int32, int64, string, uint, uint16, uint32, uint64, nil:
 			valStr = fmt.Sprint(val)
 			vals = append(vals, makeImportable(prefix, key.(string), valStr))
 		}

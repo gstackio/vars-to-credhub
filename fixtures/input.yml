@@ -7,6 +7,9 @@ ml-test: |
 someint: 3
 somefloat: 2.45
 somebool: false
+array-test:
+- foo
+- bar
 my_cert:
   certificate: |
     -----BEGIN CERTIFICATE----
