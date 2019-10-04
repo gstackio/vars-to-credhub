@@ -8,6 +8,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var (
+	IsJson   bool       = false
+)
+
+
 // Importable represents a credential to be loaded into Credhub via `bulk-import`
 type Importable struct {
 	Name   string      `yaml:"name"`
@@ -62,7 +67,10 @@ func getType(key string, valStr string) string {
 		return "certificate"
 	} else if strings.Contains(valStr, "KEY---") {
 		return "rsa"
+	} else if IsJson {
+		return "json"
 	}
+
 	return "value"
 }
 
@@ -91,6 +99,7 @@ func Transform(prefix string, input io.Reader) (BulkImport, error) {
 			if isMap(val) {
 				vals = append(vals, handleMap(val.(map[interface{}]interface{}), prefix, key.(string)))
 			} else if isArray(val) {
+				IsJson = true
 				vals = append(vals, handleArray(val.([]interface{}), prefix, key.(string)))
 			} else {
 				return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values & maps are supported", v)
