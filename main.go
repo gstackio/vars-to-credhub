@@ -15,12 +15,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Version the program version number
+var Version = "(development)"
+
 var (
 	varPrefix = kingpin.Flag("prefix", "credhub path prefix for vars").Short('p').Default("/concourse/main").String()
 	inputFile = kingpin.Flag("vars-file", "Pipeline vars file").Short('f').Required().File()
 )
 
 func main() {
+	var app = kingpin.Version(Version)
+	app.VersionFlag.Short('v')
+	app.HelpFlag.Short('h')
 	kingpin.Parse()
 
 	var b bytes.Buffer
