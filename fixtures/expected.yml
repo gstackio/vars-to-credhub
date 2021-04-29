@@ -28,13 +28,13 @@ credentials:
 - name: /plop/my_cert
   type: certificate
   value:
-    ca: |
-      -----BEGIN CERTIFICATE----
-      also fake
-      -----END CERTIFICATE----
     certificate: |
       -----BEGIN CERTIFICATE----
       fake cert
+      -----END CERTIFICATE----
+    ca: |
+      -----BEGIN CERTIFICATE----
+      also fake
       -----END CERTIFICATE----
     private_key: |
       -----BEGIN FAKE RSA PRIVATE KEY----

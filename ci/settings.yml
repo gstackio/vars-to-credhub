@@ -66,9 +66,8 @@ jobs:
                 - build
                 - -o
                 - ../compiled-binary/vars-to-credhub
-        - get: gk-ops-image
         - task: smoke-test
-          image: gk-ops-image
+          image: build-container
           config:
             platform: linux
             inputs:
@@ -116,13 +115,4 @@ resources:
     source:
       repository: golang
       tag:        (( concat meta.go.version "-alpine" ))
-    check_every: 24h
-
-  - name: gk-ops-image
-    type: docker-image
-    icon: docker
-    source:
-      repository: harbor.ci.gstack.io/gstack/gk-ops
-      username:   ((docker-registry-username))
-      password:   ((docker-registry-password))
     check_every: 24h

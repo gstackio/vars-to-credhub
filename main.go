@@ -39,7 +39,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(out.String())
+	fmt.Print(out.String())
 
 	// taken from https://rosettacode.org/wiki/Check_output_device_is_a_terminal#Go
 	if terminal.IsTerminal(int(os.Stdout.Fd())) {
