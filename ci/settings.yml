@@ -40,14 +40,6 @@ jobs:
     plan:
       - (( inline ))
       - do:
-
-        - (( inline ))
-        - {}
-        - task: test
-          config:
-            caches:
-              - path: gopath
-
         - (( append ))
         - get: build-container
           trigger: true
