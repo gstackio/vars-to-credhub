@@ -1,0 +1,119 @@
+---
+meta:
+  name:    vars-to-credhub
+  target:  gk-plat-devs
+  url:     https://ci.gstack.io
+
+  initial_version: 1.0.0
+
+  go:
+    version: "1.16"
+    binary: vars-to-credhub
+    cmd_module: .
+
+  git:
+    email:  ((git-commit-email))
+    name:   ((git-commit-name))
+
+  aws:
+    bucket:      (( grab meta.pipeline ))
+    region_name: us-east-1
+    access_key:  ((aws-access-key))
+    secret_key:  ((aws-secret-key))
+
+  github:
+    owner:  gstackio
+    repo:   vars-to-credhub
+    branch: master
+    private_key:  ((github-private-key))
+    access_token: ((github-access-token))
+
+  slack:
+    webhook:       ((slack-webhook))
+    username:      ((slack-username))
+    icon:          ((slack-icon-url))
+    channel:       "#pipelines-notifications"
+
+jobs:
+
+  - name: test
+    plan:
+      - (( inline ))
+      - do:
+        - (( append ))
+        - get: build-container
+          trigger: true
+        - task: compile
+          image: build-container
+          config:
+            platform: linux
+            inputs:
+              - name: git
+            outputs:
+              - name: compiled-binary
+            run:
+              dir: git
+              path: go
+              args:
+                - build
+                - -o
+                - ../compiled-binary/vars-to-credhub
+        - get: gk-ops-image
+        - task: smoke-test
+          image: gk-ops-image
+          config:
+            platform: linux
+            inputs:
+              - name: compiled-binary
+              - name: git
+            run:
+              path: sh
+              args:
+                - -exc
+                - |
+                  export PATH=${PWD}/compiled-binary:${PATH}
+
+                  git/tests/invalid.sh
+                  git/tests/valid.sh
+
+resources:
+
+  - name: version
+    type: semver
+    source:
+      bucket:            (( prune ))
+      region_name:       (( prune ))
+      key:               (( prune ))
+      access_key_id:     (( prune ))
+      secret_access_key: (( prune ))
+      driver:      git
+      uri:         git@github.com:gstackio/gk-pipelines-compass.git
+      branch:      master
+      file:        (( concat "versions/" meta.pipeline ))
+      private_key: ((github-private-key))
+      git_user:    "((git-commit-name)) <((git-commit-email))>"
+
+  - name: git
+    webhook_token: ((concourse-webhook-token))
+    check_every: 24h
+
+  - name: git-pull-requests
+    webhook_token: ((concourse-webhook-token))
+    # check_every: 1m # we leave the default here
+
+  - name: build-container
+    type: docker-image
+    icon: docker
+    source:
+      repository: golang
+      tag:        (( concat meta.go.version "-alpine" ))
+    check_every: 24h
+
+  - name: gk-ops-image
+    type: docker-image
+    icon: docker
+    source:
+      repository: harbor.ci.gstack.io/gstack/gk-ops
+      username:   ((docker-registry-username))
+      password:   ((docker-registry-password))
+    check_every: 24h

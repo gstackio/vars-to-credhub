@@ -1,0 +1,14 @@
+name: Concourse resource-check trigger for git branches
+on: push
+jobs:
+  trigger-resource-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger resource check
+        uses: gstackio/trigger-concourse-resource-check-action@v1.0.0
+        with:
+          concourse-url:           https://ci.gstack.io
+          concourse-team:          gk-plat-devs
+          concourse-pipeline:      vars-to-credhub
+          concourse-resource:      git
+          concourse-webhook-token: ${{ secrets.CONCOURSE_WEBHOOK_TOKEN }}

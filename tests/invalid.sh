@@ -1,7 +1,9 @@
 #!/bin/sh
 
+export PATH=".:${PATH}"
+
 set -x
-./vars-to-credhub --vars-file="fixtures/input_invalid.yml" 2> /dev/null
+vars-to-credhub --vars-file="fixtures/input_invalid.yml" 2> /dev/null
 error=$?
 set +x
 

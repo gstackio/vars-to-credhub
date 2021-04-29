@@ -1,2 +1,2 @@
-vendor/
-vars-to-credhub*
+/result.yml
+/vars-to-credhub*
