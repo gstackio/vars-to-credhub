@@ -81,10 +81,9 @@ jobs:
                 - |
                   export PATH=${PWD}/compiled-binary:${PATH}
 
-                  pushd "git" > /dev/null
-                      tests/invalid.sh
-                      tests/valid.sh
-                  popd > /dev/null
+                  cd "git" || exit 1
+                  tests/invalid.sh
+                  tests/valid.sh
 
 resources:
 
