@@ -32,6 +32,25 @@ func isArray(x interface{}) bool {
 	return strings.HasPrefix(t, "[]inter")
 }
 
+func handleMapSlice(mapVal yaml.MapSlice, prefix string, parentKey string) Importable {
+	idxToDelete := -1
+	for idx, item := range mapVal {
+		if item.Value == "public_key_fingerprint" {
+			idxToDelete = idx
+			break
+		}
+	}
+	value := mapVal
+	if idxToDelete >= 0 {
+		value = append(mapVal[:idxToDelete], mapVal[idxToDelete+1:]...)
+	}
+	return Importable{
+		Name:  fmt.Sprintf("%s/%s", prefix, parentKey),
+		Type:  getType(parentKey, fmt.Sprint(mapVal)),
+		Value: value,
+	}
+}
+
 func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey string) Importable {
 	//RSA key types if output from bosh will have a fingerprint that credhub
 	//can't deal with, so we'll just remove it. Delete is harmless if the
@@ -77,7 +96,7 @@ func makeImportable(prefix string, key string, valStr string) Importable {
 func Transform(prefix string, input io.Reader) (BulkImport, error) {
 	decoder := yaml.NewDecoder(input)
 
-	var pipelineVars map[interface{}]interface{}
+	var pipelineVars yaml.MapSlice
 	err := decoder.Decode(&pipelineVars)
 	if err != nil {
 		return BulkImport{
@@ -86,21 +105,23 @@ func Transform(prefix string, input io.Reader) (BulkImport, error) {
 	}
 
 	vals := make([]Importable, 0, len(pipelineVars))
-	for key, val := range pipelineVars {
-
+	for _, mapItem := range pipelineVars {
+		key := mapItem.Key
+		val := mapItem.Value
 		// Let's require, for now, simple types & maps in the var field
-		var valStr string
-		switch v := val.(type) {
+		switch valType := val.(type) {
+		case yaml.MapSlice:
+			vals = append(vals, handleMapSlice(val.(yaml.MapSlice), prefix, key.(string)))
 		default:
 			if isMap(val) {
 				vals = append(vals, handleMap(val.(map[interface{}]interface{}), prefix, key.(string)))
 			} else if isArray(val) {
 				vals = append(vals, handleArray(val.([]interface{}), prefix, key.(string)))
 			} else {
-				return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values & maps are supported", v)
+				return BulkImport{}, fmt.Errorf("Invalid value type in vars file %T. Currently only primitive values & maps are supported", valType)
 			}
 		case bool, float32, float64, int, int16, int32, int64, string, uint, uint16, uint32, uint64, nil:
-			valStr = fmt.Sprint(val)
+			valStr := fmt.Sprint(val)
 			vals = append(vals, makeImportable(prefix, key.(string), valStr))
 		}
 	}

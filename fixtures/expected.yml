@@ -1,0 +1,53 @@
+credentials:
+- name: /plop/foo
+  type: value
+  value: bar
+- name: /plop/bar
+  type: value
+  value: baz
+- name: /plop/ml-test
+  type: value
+  value: |
+    multi-value
+    string
+    test
+- name: /plop/someint
+  type: value
+  value: "3"
+- name: /plop/somefloat
+  type: value
+  value: "2.45"
+- name: /plop/somebool
+  type: value
+  value: "false"
+- name: /plop/array-test
+  type: json
+  value:
+  - foo
+  - bar
+- name: /plop/my_cert
+  type: certificate
+  value:
+    ca: |
+      -----BEGIN CERTIFICATE----
+      also fake
+      -----END CERTIFICATE----
+    certificate: |
+      -----BEGIN CERTIFICATE----
+      fake cert
+      -----END CERTIFICATE----
+    private_key: |
+      -----BEGIN FAKE RSA PRIVATE KEY----
+      fake key
+      -----END FAKE RSA PRIVATE KEY----
+- name: /plop/uaa-key
+  type: rsa
+  value:
+    private_key: |
+      -----BEGIN FAKE RSA PRIVATE KEY-----
+      fake key is fake
+      -----END FAKE RSA PRIVATE KEY----
+    public_key: |
+      -----BEGIN PUBLIC KEY-----
+      fake public
+      -----END PUBLIC KEY-----
