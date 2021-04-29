@@ -78,7 +78,12 @@ func Transform(prefix string, input io.Reader) (BulkImport, error) {
 	decoder := yaml.NewDecoder(input)
 
 	var pipelineVars map[interface{}]interface{}
-	decoder.Decode(&pipelineVars)
+	err := decoder.Decode(&pipelineVars)
+	if err != nil {
+		return BulkImport{
+			Credentials: nil,
+		}, err
+	}
 
 	vals := make([]Importable, 0, len(pipelineVars))
 	for key, val := range pipelineVars {

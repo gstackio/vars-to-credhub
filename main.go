@@ -34,12 +34,16 @@ func main() {
 	if bulkImport, err := Transform(*varPrefix, *inputFile); err != nil {
 		log.Fatal(err)
 		os.Exit(1)
-	} else {
-		encoder.Encode(bulkImport)
-		fmt.Println(out.String())
-		// taken from https://rosettacode.org/wiki/Check_output_device_is_a_terminal#Go
-		if terminal.IsTerminal(int(os.Stdout.Fd())) {
-			colorstring.Println("[bold][green]Done! Double check these results, then save and run [reset]credhub import --file /path/to/file")
-		}
+	} else if err := encoder.Encode(bulkImport); err != nil {
+		log.Fatal(err)
+		os.Exit(1)
 	}
+
+	fmt.Println(out.String())
+
+	// taken from https://rosettacode.org/wiki/Check_output_device_is_a_terminal#Go
+	if terminal.IsTerminal(int(os.Stdout.Fd())) {
+		colorstring.Println("[bold][green]Done! Double check these results, then save and run [reset]credhub import --file /path/to/file")
+	}
+
 }
