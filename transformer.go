@@ -10,10 +10,9 @@ import (
 
 // Importable represents a credential to be loaded into Credhub via `bulk-import`
 type Importable struct {
-	Name   string      `yaml:"name"`
-	Type   string      `yaml:"type"`
-	Value  string      `yaml:"value,omitempty"`
-	SubMap interface{} `yaml:"subMapValue,omitempty"`
+	Name  string      `yaml:"name"`
+	Type  string      `yaml:"type"`
+	Value interface{} `yaml:"value,omitempty"`
 }
 
 // BulkImport represents what will be actually sent to Credhub
@@ -39,17 +38,17 @@ func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey stri
 	//key DNE - so just do it on every map.
 	delete(mapVal, "public_key_fingerprint")
 	return Importable{
-		Name:   fmt.Sprintf("%s/%s", prefix, parentKey),
-		Type:   getType(parentKey, fmt.Sprint(mapVal)),
-		SubMap: mapVal,
+		Name:  fmt.Sprintf("%s/%s", prefix, parentKey),
+		Type:  getType(parentKey, fmt.Sprint(mapVal)),
+		Value: mapVal,
 	}
 }
 
 func handleArray(arrayVal []interface{}, prefix string, key string) Importable {
 	return Importable{
-		Name:   fmt.Sprintf("%s/%s", prefix, key),
-		Type:   "json",
-		SubMap: arrayVal,
+		Name:  fmt.Sprintf("%s/%s", prefix, key),
+		Type:  "json",
+		Value: arrayVal,
 	}
 }
 
