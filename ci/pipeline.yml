@@ -300,6 +300,7 @@ jobs:
             outputs:
               - name: gh
               - name: pushme
+              - name: notifications
             run:
               path: (( concat "./gopath/src/" meta.go.module "/ci/scripts/shipit" ))
               args: []
