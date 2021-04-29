@@ -48,7 +48,7 @@ func handleMap(mapVal map[interface{}]interface{}, prefix string, parentKey stri
 func handleArray(arrayVal []interface{}, prefix string, key string) Importable {
 	return Importable{
 		Name:   fmt.Sprintf("%s/%s", prefix, key),
-		Type:   getType(key, fmt.Sprint(arrayVal)),
+		Type:   "json",
 		SubMap: arrayVal,
 	}
 }
