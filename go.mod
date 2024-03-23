@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
-	github.com/onsi/gomega v1.31.1
+	github.com/onsi/gomega v1.32.0
 	github.com/sclevine/spec v1.4.0
 	golang.org/x/crypto v0.21.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
