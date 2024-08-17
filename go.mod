@@ -1,6 +1,6 @@
 module gstack.io/yaml/vars-to-credhub
 
-go 1.22
+go 1.23
 
 require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
