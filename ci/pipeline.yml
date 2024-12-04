@@ -8,8 +8,9 @@
 # ci/settings.yml and override what needs overridden.
 # This uses spruce, so you have some options there.
 #
-# author:  James Hunt <james@niftylogic.com>
-# created: 2016-03-30
+# original author: James Hunt <james@niftylogic.com>
+# created:         2016-03-30
+# maintainer:      Benjamin Gandon (Gstack)
 
 meta:
   name:     (( param "Please name your pipeline" ))
@@ -43,12 +44,14 @@ meta:
     secret_key: (( param "Please set your AWS Secret Key ID" ))
 
   github:
-    uri:          (( concat "git@github.com:" meta.github.owner "/" meta.github.repo ))
-    owner:        (( param "Please specify the name of the user / organization that owns the Github repository" ))
-    repo:         (( param "Please specify the name of the Github repository" ))
-    branch:       master
-    private_key:  (( param "Please generate an SSH Deployment Key for this repo and specify it here" ))
-    access_token: (( param "Please generate a Personal Access Token and specify it here" ))
+    uri:            (( concat "git@github.com:" meta.github.owner "/" meta.github.repo ))
+    owner:          (( param "Please specify the name of the user / organization that owns the Github repository" ))
+    repo:           (( param "Please specify the name of the Github repository" ))
+    branch:         master
+    pr_base_branch: (( grab meta.github.branch ))
+    release_branch: (( grab meta.github.branch ))
+    private_key:    (( param "Please generate an SSH Deployment Key for this repo and specify it here" ))
+    access_token:   (( param "Please generate a Personal Access Token and specify it here" ))
 
   slack:
     webhook:      (( param "Please specify your Slack Incoming Webhook Integration URL" ))
@@ -59,8 +62,8 @@ meta:
     success_moji: ":airplane_departure:"
     upset_moji:   ":sadpanda:"
     pipeline_url:  (( concat meta.url "/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}" ))
-    fail_link:     (( concat "<" meta.slack.pipeline_url "/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}| Concourse Failure! " meta.slack.upset_moji ">" ))
-    fail_text:    '(( concat meta.slack.fail_link " " meta.pipeline ": `${BUILD_JOB_NAME}` job failed" ))'
+    fail_link:     (( concat "<" meta.slack.pipeline_url "/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}| Let's go fix it!>" ))
+    fail_text:    '(( concat meta.pipeline ": `${BUILD_JOB_NAME}` job has failed " meta.slack.upset_moji " " meta.slack.fail_link " :hammer_and_wrench:" ))'
 
 groups:
   - name: (( grab meta.pipeline ))
@@ -98,6 +101,7 @@ jobs:
             MODULE: (( grab meta.go.module ))
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -163,6 +167,7 @@ jobs:
             SUCCESS_MOJI: (( grab meta.slack.success_moji ))
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -205,6 +210,7 @@ jobs:
         params: { file: version/number }
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -219,6 +225,7 @@ jobs:
       - { put: version,                params: { file: version/number} }
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -233,6 +240,7 @@ jobs:
       - { put: version,                 params: { file: version/number } }
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -247,6 +255,7 @@ jobs:
       - { put: version,                 params: { file: version/number } }
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -279,20 +288,20 @@ jobs:
             path: (( concat "./gopath/src/" meta.go.module "/ci/scripts/shipit" ))
             args: []
           params:
-            BINARY:       (( grab meta.go.binary ))
-            REPO_ROOT:    (( concat "gopath/src/" meta.go.module ))
-            VERSION_FROM: version/number
-            RELEASE_NAME: (( grab meta.release ))
-            RELEASE_ROOT: gh
-            REPO_OUT:     pushme
+            BINARY:           (( grab meta.go.binary ))
+            REPO_ROOT:        (( concat "gopath/src/" meta.go.module ))
+            VERSION_FROM:     version/number
+            RELEASE_NAME:     (( grab meta.release ))
+            RELEASE_ROOT:     gh
+            REPO_OUT:         pushme
             NOTIFICATION_OUT: notifications
-            BRANCH:       (( grab meta.github.branch ))
-            GITHUB_OWNER: (( grab meta.github.owner ))
-            GITHUB_REPO: (( grab meta.github.repo ))
-            CMD_PKG:      (( grab meta.go.cmd_module ))
-            STATIC_BINARY:  (( grab meta.go.force_static_binary ))
-            GIT_EMAIL:      (( grab meta.git.email ))
-            GIT_NAME:       (( grab meta.git.name ))
+            RELEASE_BRANCH:   (( grab meta.github.release_branch ))
+            GITHUB_OWNER:     (( grab meta.github.owner ))
+            GITHUB_REPO:      (( grab meta.github.repo ))
+            CMD_PKG:          (( grab meta.go.cmd_module ))
+            STATIC_BINARY:    (( grab meta.go.force_static_binary ))
+            GIT_EMAIL:        (( grab meta.git.email ))
+            GIT_NAME:         (( grab meta.git.name ))
       - put: version
         params: { bump: final }
       - put: git
@@ -314,6 +323,7 @@ jobs:
             text_file: notifications/message
     on_failure:
       put: notify
+      no_get: true
       params:
         channel:  (( grab meta.slack.channel ))
         username: (( grab meta.slack.username ))
@@ -329,7 +339,7 @@ resource_types:
   - name: pull-request
     type: registry-image
     source:
-      repository: teliaoss/github-pr-resource
+      repository: cfcommunity/github-pr-resource
 
 resources:
   - name: image
@@ -381,4 +391,4 @@ resources:
     source:
       access_token: (( grab meta.github.access_token ))
       repository:   (( concat meta.github.owner "/" meta.github.repo ))
-      base_branch:  (( grab meta.github.branch ))
+      base_branch:  (( grab meta.github.pr_base_branch ))
