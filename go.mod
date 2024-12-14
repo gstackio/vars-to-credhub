@@ -4,9 +4,9 @@ go 1.23
 
 require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
-	github.com/onsi/gomega v1.36.0
+	github.com/onsi/gomega v1.36.1
 	github.com/sclevine/spec v1.4.0
-	golang.org/x/crypto v0.30.0
+	golang.org/x/crypto v0.31.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/yaml.v2 v2.4.0
 )
